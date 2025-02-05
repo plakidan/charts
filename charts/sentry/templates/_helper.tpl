@@ -286,12 +286,36 @@ Set redis port
 Set redis password
 */}}
 {{- define "sentry.redis.password" -}}
-{{- if .Values.redis.enabled -}}
-{{ .Values.redis.password }}
-{{- else -}}
+{{- if and (.Values.redis.enabled) (.Values.redis.auth.enabled) -}}
+{{ .Values.redis.auth.password }}
+{{- else if .Values.externalRedis.password -}}
 {{ .Values.externalRedis.password }}
+{{- else }}
 {{- end -}}
 {{- end -}}
+
+{{/*
+Set redis db
+*/}}
+{{- define "sentry.redis.db" -}}
+{{- if .Values.redis.enabled -}}
+{{ default 0 .Values.redis.db }}
+{{- else -}}
+{{ default 0 .Values.externalRedis.db }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set redis ssl
+*/}}
+{{- define "sentry.redis.ssl" -}}
+{{- if .Values.redis.enabled -}}
+{{ default false .Values.redis.ssl }}
+{{- else -}}
+{{ default false .Values.externalRedis.ssl }}
+{{- end -}}
+{{- end -}}
+
 
 {{/*
 Create the name of the service account to use
@@ -434,6 +458,104 @@ Set Kafka bootstrap servers string
 {{- end -}}
 {{- end -}}
 
+{{/*
+SASL auth setings for Kafka:
+* https://github.com/getsentry/snuba/blob/24.7.1/snuba/settings/__init__.py#L219-L229
+* https://github.com/getsentry/sentry/blob/24.7.1/src/sentry/utils/kafka_config.py#L9-L34
+* https://github.com/getsentry/sentry/blob/24.7.1/src/sentry/conf/server.py#L2827-L2836
+*/}}
+
+{{/*
+Set Kafka security protocol
+*/}}
+{{- define "sentry.kafka.security_protocol" -}}
+{{- if .Values.kafka.enabled -}}
+{{ default "plaintext" .Values.kafka.listeners.client.protocol }}
+{{- else -}}
+{{ default "plaintext" .Values.externalKafka.security.protocol }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set Kafka sasl mechanism
+*/}}
+{{- define "sentry.kafka.sasl_mechanism" -}}
+{{- $CheckProtocol := include "sentry.kafka.security_protocol" . -}}
+{{- if (regexMatch "^SASL_" $CheckProtocol) -}}
+{{- if .Values.kafka.enabled -}}
+{{ default "None" (split "," .Values.kafka.sasl.enabledMechanisms)._0 }}
+{{- else -}}
+{{ default "None" .Values.externalKafka.sasl.mechanism }}
+{{- end -}}
+{{- else -}}
+{{ "None" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set Kafka sasl username
+*/}}
+{{- define "sentry.kafka.sasl_username" -}}
+{{- $CheckProtocol := include "sentry.kafka.security_protocol" . -}}
+{{- if (regexMatch "^SASL_" $CheckProtocol) -}}
+{{- if .Values.kafka.enabled -}}
+{{ default "None" (first (default tuple .Values.kafka.sasl.client.users)) }}
+{{- else -}}
+{{ default "None" .Values.externalKafka.sasl.username }}
+{{- end -}}
+{{- else -}}
+{{ "None" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set Kafka sasl password
+*/}}
+{{- define "sentry.kafka.sasl_password" -}}
+{{- $CheckProtocol := include "sentry.kafka.security_protocol" . -}}
+{{- if (regexMatch "^SASL_" $CheckProtocol) -}}
+{{- if .Values.kafka.enabled -}}
+{{ default "None" (first (default tuple .Values.kafka.sasl.client.passwords)) }}
+{{- else -}}
+{{ default "None" .Values.externalKafka.sasl.password }}
+{{- end -}}
+{{- else -}}
+{{ "None" }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set Senty compression.type for Kafka
+*/}}
+{{- define "sentry.kafka.compression_type" -}}
+{{- if .Values.kafka.enabled -}}
+{{ default "" .Values.sentry.kafka.compression.type }}
+{{- else -}}
+{{ default "" .Values.externalKafka.compression.type }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set Senty message.max.bytes for Kafka
+*/}}
+{{- define "sentry.kafka.message_max_bytes" -}}
+{{- if .Values.kafka.enabled -}}
+{{ default 50000000 .Values.sentry.kafka.message.max.bytes | int64 }}
+{{- else -}}
+{{ default 50000000 .Values.externalKafka.message.max.bytes | int64 }}
+{{- end -}}
+{{- end -}}
+
+{{/*
+Set Senty socket.timeout for Kafka
+*/}}
+{{- define "sentry.kafka.socket_timeout_ms" -}}
+{{- if .Values.kafka.enabled -}}
+{{ default 1000 .Values.sentry.kafka.socket.timeout.ms | int64 }}
+{{- else -}}
+{{ default 1000 .Values.externalKafka.socket.timeout.ms | int64 }}
+{{- end -}}
+{{- end -}}
 
 {{/*
 Set RabbitMQ host
@@ -454,6 +576,44 @@ Common Snuba environment variables
   value: /etc/snuba/settings.py
 - name: DEFAULT_BROKERS
   value: {{ include "sentry.kafka.bootstrap_servers_string" . | quote }}
+{{- $sentryKafkaSaslMechanism := include "sentry.kafka.sasl_mechanism" . -}}
+{{- if not (eq "None" $sentryKafkaSaslMechanism) }}
+- name: KAFKA_SASL_MECHANISM
+  value: {{ $sentryKafkaSaslMechanism | quote}}
+{{- end }}
+{{- $sentryKafkaSaslUsername := include "sentry.kafka.sasl_username" . -}}
+{{- if not (eq "None" $sentryKafkaSaslUsername) }}
+- name: KAFKA_SASL_USERNAME
+  value: {{ $sentryKafkaSaslUsername | quote }}
+{{- end }}
+{{- $sentryKafkaSaslPassword := include "sentry.kafka.sasl_password" . -}}
+{{- if not (eq "None" $sentryKafkaSaslPassword) }}
+- name: KAFKA_SASL_PASSWORD
+  value: {{ $sentryKafkaSaslPassword | quote }}
+{{- end }}
+- name: KAFKA_SECURITY_PROTOCOL
+  value: {{ include "sentry.kafka.security_protocol" . | quote }}
+{{- if and (.Values.redis.enabled) (.Values.redis.auth.enabled) }}
+{{- if .Values.redis.auth.password }}
+- name: REDIS_PASSWORD
+  value: {{ .Values.redis.auth.password | quote }}
+{{- else if .Values.redis.auth.existingSecret }}
+- name: REDIS_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ default (include "sentry.redis.fullname" .) .Values.redis.auth.existingSecret }}
+      key: {{ default "redis-password" .Values.redis.auth.existingSecretPasswordKey }}
+{{- end }}
+{{- else if .Values.externalRedis.password }}
+- name: REDIS_PASSWORD
+  value: {{ .Values.externalRedis.password | quote }}
+{{- else if .Values.externalRedis.existingSecret }}
+- name: REDIS_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalRedis.existingSecret }}
+      key: {{ default "redis-password" .Values.externalRedis.existingSecretKey }}
+{{- end }}
 {{- if .Values.externalClickhouse.existingSecret }}
 - name: CLICKHOUSE_PASSWORD
   valueFrom:
@@ -467,6 +627,8 @@ Common Snuba environment variables
 - name: UWSGI_HTTP_SOCKET
   value: "[::]:1218"
 {{- end }}
+- name: REDIS_PORT
+  value:  {{ default "6379" (include "sentry.redis.port" . | quote ) -}}
 {{- end -}}
 
 {{- define "vroom.env" -}}
@@ -484,6 +646,10 @@ Common Snuba environment variables
 Common Sentry environment variables
 */}}
 {{- define "sentry.env" -}}
+{{- $redisHost := include "sentry.redis.host" . -}}
+{{- $redisPort := include "sentry.redis.port" . -}}
+{{- $redisDb     := include "sentry.redis.db" . -}}
+{{- $redisProto  := ternary "rediss" "redis" (eq (include "sentry.redis.ssl" .) "true")  -}}
 - name: SNUBA
   value: http://{{ template "sentry.fullname" . }}-snuba:{{ template "snuba.port" . }}
 - name: VROOM
@@ -569,6 +735,44 @@ Common Sentry environment variables
       name: {{ .Values.filestore.s3.existingSecret }}
       key: {{ default "s3-secret-access-key" .Values.filestore.s3.secretAccessKeyRef }}
 {{- end }}
+{{- if .Values.redis.enabled }}
+{{- if .Values.redis.password }}
+- name: REDIS_PASSWORD
+  value: {{ .Values.redis.password | quote }}
+{{- else if .Values.redis.existingSecret }}
+- name: REDIS_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ default (include "sentry.redis.fullname" .) .Values.redis.existingSecret }}
+      key: {{ default "redis-password" .Values.redis.existingSecretKey }}
+{{- end }}
+{{- else if .Values.externalRedis.password }}
+- name: REDIS_PASSWORD
+  value: {{ .Values.externalRedis.password | quote }}
+{{- else if .Values.externalRedis.existingSecret }}
+- name: REDIS_PASSWORD
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalRedis.existingSecret }}
+      key: {{ default "redis-password" .Values.externalRedis.existingSecretKey }}
+{{- end }}
+{{- if and (.Values.redis.enabled) (.Values.redis.auth.existingSecret) }}
+- name: HELM_CHARTS_SENTRY_REDIS_PASSWORD_CONTROLLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.redis.auth.existingSecret }}
+      key: {{ default "redis-password" .Values.redis.auth.existingSecretPasswordKey }}
+- name: BROKER_URL
+  value: "{{ $redisProto }}://:$(HELM_CHARTS_SENTRY_REDIS_PASSWORD_CONTROLLED)@{{ $redisHost }}:{{ $redisPort }}/{{ $redisDb }}"
+{{- else if (.Values.externalRedis.existingSecret) }}
+- name: HELM_CHARTS_SENTRY_REDIS_PASSWORD_CONTROLLED
+  valueFrom:
+    secretKeyRef:
+      name: {{ .Values.externalRedis.existingSecret }}
+      key: {{ default "redis-password" .Values.externalRedis.existingSecretKey }}
+- name: BROKER_URL
+  value: "{{ $redisProto }}://:$(HELM_CHARTS_SENTRY_REDIS_PASSWORD_CONTROLLED)@{{ $redisHost }}:{{ $redisPort }}/{{ $redisDb }}"
+{{- end }}
 {{- if and (eq .Values.filestore.backend "gcs") .Values.filestore.gcs.secretName }}
 - name: GOOGLE_APPLICATION_CREDENTIALS
   value: /var/run/secrets/google/{{ .Values.filestore.gcs.credentialsFile }}
@@ -605,22 +809,22 @@ Common Sentry environment variables
   valueFrom:
     secretKeyRef:
       name: {{ .Values.discord.existingSecret }}
-      key: {{ default "application-id" .Values.slack.existingSecretApplicationId }}
+      key: {{ default "application-id" .Values.discord.existingSecretApplicationId }}
 - name: DISCORD_PUBLIC_KEY
   valueFrom:
     secretKeyRef:
       name: {{ .Values.discord.existingSecret }}
-      key: {{ default "public-key" .Values.slack.existingSecretPublicKey }}
+      key: {{ default "public-key" .Values.discord.existingSecretPublicKey }}
 - name: DISCORD_CLIENT_SECRET
   valueFrom:
     secretKeyRef:
       name: {{ .Values.discord.existingSecret }}
-      key: {{ default "client-secret" .Values.slack.existingSecretClientSecret }}
+      key: {{ default "client-secret" .Values.discord.existingSecretClientSecret }}
 - name: DISCORD_BOT_TOKEN
   valueFrom:
     secretKeyRef:
       name: {{ .Values.discord.existingSecret }}
-      key: {{ default "bot-token" .Values.slack.existingSecretBotToken }}      
+      key: {{ default "bot-token" .Values.discord.existingSecretBotToken }}
 {{- end }}
 {{- if and .Values.github.existingSecret }}
 - name: GITHUB_APP_PRIVATE_KEY

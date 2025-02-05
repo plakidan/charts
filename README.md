@@ -8,11 +8,19 @@ Big thanks to the maintainers of the [deprecated chart](https://github.com/helm/
 
 ## How this chart works
 
-`helm repo add sentry https://sentry-kubernetes.github.io/charts`
+```
+helm repo add sentry https://sentry-kubernetes.github.io/charts
+helm repo update
+helm install my-sentry sentry/sentry --wait --timeout=1000s
+```
 
 ## Values
 
 For now the full list of values is not documented but you can get inspired by the values.yaml specific to each directory.
+
+## Upgrading from 23.x.x Version of This Chart to 24.x.x/25.x.x
+
+Make sure to revert the changes on Clickhouse replica counts if the change doesn't suit you.
 
 ## Upgrading from 22.x.x Version of This Chart to 23.x.x
 
