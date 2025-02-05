@@ -152,12 +152,17 @@ sentry.conf.py: |-
   # General #
   ###########
 
+  # Disable sends anonymous usage statistics
+  SENTRY_BEACON = False
 
   secret_key = env('SENTRY_SECRET_KEY')
   if not secret_key:
     raise Exception('Error: SENTRY_SECRET_KEY is undefined')
 
   SENTRY_OPTIONS['system.secret-key'] = secret_key
+
+  # Set default for SAMPLED_DEFAULT_RATE:
+  SAMPLED_DEFAULT_RATE = {{ .Values.global.sampledDefaultRate | default 1.0 }}
 
   # Instruct Sentry that this install intends to be run by a single organization
   # and thus various UI optimizations should be enabled.
@@ -251,6 +256,14 @@ sentry.conf.py: |-
 
   SENTRY_EVENTSTREAM = "sentry.eventstream.kafka.KafkaEventStream"
   SENTRY_EVENTSTREAM_OPTIONS = {"producer_configuration": DEFAULT_KAFKA_OPTIONS}
+
+  {{- if ((.Values.kafkaTopicOverrides).prefix) }}
+  SENTRY_CHARTS_KAFKA_TOPIC_PREFIX = {{ .Values.kafkaTopicOverrides.prefix | quote }}
+
+  from sentry.conf.types.kafka_definition import Topic
+  for topic in Topic:
+    KAFKA_TOPIC_OVERRIDES[topic.value] = f"{SENTRY_CHARTS_KAFKA_TOPIC_PREFIX}{topic.value}"
+  {{- end }}
 
   KAFKA_CLUSTERS["default"] = DEFAULT_KAFKA_OPTIONS
 
@@ -504,6 +517,8 @@ sentry.conf.py: |-
 
               {{- if .Values.sentry.features.enableSpan }}
               "projects:span-metrics-extraction",
+              "projects:span-metrics-extraction-addons",
+              "organizations:indexed-spans-extraction",
               "organizations:starfish-browser-resource-module-image-view",
               "organizations:starfish-browser-resource-module-ui",
               "organizations:starfish-browser-webvitals",

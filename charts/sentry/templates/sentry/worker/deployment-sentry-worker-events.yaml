@@ -42,10 +42,16 @@ spec:
       {{- if .Values.sentry.workerEvents.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.sentry.workerEvents.nodeSelector | indent 8 }}
+      {{- else if .Values.global.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.workerEvents.tolerations }}
       tolerations:
 {{ toYaml .Values.sentry.workerEvents.tolerations | indent 8 }}
+      {{- else if .Values.global.tolerations }}
+      tolerations:
+{{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.workerEvents.topologySpreadConstraints }}
       topologySpreadConstraints:
@@ -87,6 +93,10 @@ spec:
           {{- if .Values.sentry.workerEvents.logFormat }}
           - "--logformat"
           - "{{ .Values.sentry.workerEvents.logFormat }}"
+          {{- end }}
+          {{- if .Values.sentry.workerEvents.maxTasksPerChild }}
+          - "--max-tasks-per-child"
+          - "{{ .Values.sentry.workerEvents.maxTasksPerChild }}"
           {{- end }}
         env:
         - name: C_FORCE_ROOT

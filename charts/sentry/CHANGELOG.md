@@ -1,5 +1,168 @@
 # Changelog
 
+## [26.14.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.13.0...sentry-v26.14.0) (2025-01-31)
+
+
+### Features
+
+* Add monitorsClockTasks and monitorsClockTick ([#1690](https://github.com/sentry-kubernetes/charts/issues/1690)) ([1fe663d](https://github.com/sentry-kubernetes/charts/commit/1fe663d345c9e420c901f25dc306e0e27549d905))
+
+
+### Bug Fixes
+
+* set replication factor for kafka stability ([#1606](https://github.com/sentry-kubernetes/charts/issues/1606)) ([7ebb1f6](https://github.com/sentry-kubernetes/charts/commit/7ebb1f636984485dd646eb482978bde3a4f3da36))
+
+## [26.13.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.12.1...sentry-v26.13.0) (2025-01-30)
+
+
+### Features
+
+* update appVersion to 25.1.0 and add topic ([#1686](https://github.com/sentry-kubernetes/charts/issues/1686)) ([31e7368](https://github.com/sentry-kubernetes/charts/commit/31e73689f25ef1ab4d17e6f41a16d91b62a4d475))
+
+## [26.12.1](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.12.0...sentry-v26.12.1) (2025-01-28)
+
+
+### Bug Fixes
+
+* rollback to 24.12.1 ([aa6cad8](https://github.com/sentry-kubernetes/charts/commit/aa6cad88fe0f2e0594aff7325d33f3ed643f250a))
+
+## [26.12.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.11.2...sentry-v26.12.0) (2025-01-26)
+
+
+### Features
+
+* add custom labels for ingress ([#1672](https://github.com/sentry-kubernetes/charts/issues/1672)) ([712a469](https://github.com/sentry-kubernetes/charts/commit/712a4696a2d163ee83baad61453e7a3fa2da4f3d))
+* add Kafka topics from upstream projects (Sentry and Snuba) for version 24.12.2 ([#1678](https://github.com/sentry-kubernetes/charts/issues/1678)) ([cf696b7](https://github.com/sentry-kubernetes/charts/commit/cf696b75d1c13b9f1af3388c3d818b8fdffee71b))
+
+
+### Bug Fixes
+
+* missing block in ingest-consumer-transactions ([#1680](https://github.com/sentry-kubernetes/charts/issues/1680)) ([424f50f](https://github.com/sentry-kubernetes/charts/commit/424f50f7f4c5572b13c68659bb91bdaba50c3e1e))
+
+## [26.11.2](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.11.1...sentry-v26.11.2) (2025-01-18)
+
+
+### Bug Fixes
+
+* update readme.md with latest configuration values ([#1666](https://github.com/sentry-kubernetes/charts/issues/1666)) ([070b19f](https://github.com/sentry-kubernetes/charts/commit/070b19f11c95bd294d9c5419ca5d7d17dfa092fa))
+
+## [26.11.1](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.11.0...sentry-v26.11.1) (2025-01-17)
+
+
+### Bug Fixes
+
+* clickhouse-chart for correct placement of internal_replication ([#1662](https://github.com/sentry-kubernetes/charts/issues/1662)) ([a3e82be](https://github.com/sentry-kubernetes/charts/commit/a3e82be0f081e4e548658d7acecdcb761a57b469))
+* global nodeSelector config option not applying to cleanup cron job ([#1654](https://github.com/sentry-kubernetes/charts/issues/1654)) ([4e764b5](https://github.com/sentry-kubernetes/charts/commit/4e764b5ab006682b609571ae0b9f06014103e194))
+
+## [26.11.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.10.0...sentry-v26.11.0) (2025-01-13)
+
+
+### Features
+
+* Sentry 24.11.2 ([#1640](https://github.com/sentry-kubernetes/charts/issues/1640)) ([70d0710](https://github.com/sentry-kubernetes/charts/commit/70d0710d0f063d346eb0743ef2745ce40d57c764))
+
+## [26.10.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.9.1...sentry-v26.10.0) (2025-01-03)
+
+
+### Features
+
+* update Sentry chart to appVersion 24.10.0 ([#1652](https://github.com/sentry-kubernetes/charts/issues/1652)) ([72f61ff](https://github.com/sentry-kubernetes/charts/commit/72f61ff7ae1a26d11865cec083861041d94e029d))
+
+## [26.9.1](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.9.0...sentry-v26.9.1) (2024-12-23)
+
+
+### Bug Fixes
+
+* add Kafka topics from upstream projects (Sentry and Snuba) for version 24.9.0 ([#1647](https://github.com/sentry-kubernetes/charts/issues/1647)) ([cac64cf](https://github.com/sentry-kubernetes/charts/commit/cac64cff98fe9b11a29c83e5f562086ad5f4e00a))
+
+## [26.9.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.8.1...sentry-v26.9.0) (2024-12-16)
+
+
+### Features
+
+* add variable for SAMPLED_DEFAULT_RATE ([#1634](https://github.com/sentry-kubernetes/charts/issues/1634)) ([7910f9d](https://github.com/sentry-kubernetes/charts/commit/7910f9d0030b9c09206e01762e284003d9e61639))
+
+## [26.8.1](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.8.0...sentry-v26.8.1) (2024-12-11)
+
+
+### Bug Fixes
+
+* Add missing ingest for feedback events ([#1630](https://github.com/sentry-kubernetes/charts/issues/1630)) ([3882cae](https://github.com/sentry-kubernetes/charts/commit/3882cae9b5cde0591f87b9021e09ddbad27ca659))
+* missing flags required for Queues and Queries instrumentation ([#1622](https://github.com/sentry-kubernetes/charts/issues/1622)) ([a9b6b61](https://github.com/sentry-kubernetes/charts/commit/a9b6b61c842c5a92f0e011d3ae74c489bb83602c))
+* missing profilingFunctionsConsumer.sidecars ([#1627](https://github.com/sentry-kubernetes/charts/issues/1627)) ([bcbd6ed](https://github.com/sentry-kubernetes/charts/commit/bcbd6ed01e76d741ab500adf1aa6038f0b36f631))
+
+## [26.8.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.7.0...sentry-v26.8.0) (2024-12-04)
+
+
+### Features
+
+* add configuration for noStrictOffsetReset ([#1620](https://github.com/sentry-kubernetes/charts/issues/1620)) ([234552e](https://github.com/sentry-kubernetes/charts/commit/234552e186a5b9ed814595ce83bc744034c93821))
+* Add missing sidecar and global parameter for deployments & hooks ([#1230](https://github.com/sentry-kubernetes/charts/issues/1230)) ([ac8143f](https://github.com/sentry-kubernetes/charts/commit/ac8143fd1607c0493ea5c60940be3e649f6d613b))
+
+## [26.7.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.6.0...sentry-v26.7.0) (2024-11-28)
+
+
+### Features
+
+* pgbouncer for postgresql ([#1607](https://github.com/sentry-kubernetes/charts/issues/1607)) ([07157bd](https://github.com/sentry-kubernetes/charts/commit/07157bd61bff026cd80d912d16c140c9168d90d3))
+
+## [26.6.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.5.0...sentry-v26.6.0) (2024-11-25)
+
+
+### Features
+
+* disable Sentry anonymous usage statistics ([#1608](https://github.com/sentry-kubernetes/charts/issues/1608)) ([b679d97](https://github.com/sentry-kubernetes/charts/commit/b679d97e21e787857a7d1dc8fd7c84ceb759e083))
+
+## [26.5.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.4.0...sentry-v26.5.0) (2024-11-05)
+
+
+### Features
+
+* recovery support multi hosts and ports of external kafka cluster ([#1588](https://github.com/sentry-kubernetes/charts/issues/1588)) ([889bd0d](https://github.com/sentry-kubernetes/charts/commit/889bd0d47235cb1ab5a7b52439f5b8df61026a03))
+
+## [26.4.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.3.0...sentry-v26.4.0) (2024-11-03)
+
+
+### Features
+
+* add maxBatchTimeMs, maxPollIntervalMs for ingestConsumerAttachments ([#1591](https://github.com/sentry-kubernetes/charts/issues/1591)) ([72af218](https://github.com/sentry-kubernetes/charts/commit/72af2189d2249cc29de1442179ce2258da958e44))
+
+## [26.3.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.2.0...sentry-v26.3.0) (2024-10-26)
+
+
+### Features
+
+* Introduce global tolerations across all components ([#1580](https://github.com/sentry-kubernetes/charts/issues/1580)) ([7b48399](https://github.com/sentry-kubernetes/charts/commit/7b48399efe73cbb582b4df34068d0104ae3d969c))
+
+## [26.2.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.1.0...sentry-v26.2.0) (2024-10-25)
+
+
+### Features
+
+* allow users to specify Kafka topic name prefix in values.yaml ([#1544](https://github.com/sentry-kubernetes/charts/issues/1544)) ([5693406](https://github.com/sentry-kubernetes/charts/commit/569340626ce1587d48040a939b80ab74874fd022))
+* **rabbitmq:** updated configuration to support Prometheus ([#1578](https://github.com/sentry-kubernetes/charts/issues/1578)) ([35f779a](https://github.com/sentry-kubernetes/charts/commit/35f779a0f18b2b9108470efc86403fa3c0eefae2))
+
+## [26.1.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v26.0.0...sentry-v26.1.0) (2024-10-25)
+
+
+### Features
+
+* add global nodeSelector fallback for all deployments ([#1576](https://github.com/sentry-kubernetes/charts/issues/1576)) ([d6eec42](https://github.com/sentry-kubernetes/charts/commit/d6eec42b2c31f42a473d1241721ff3d64111400f))
+
+## [26.0.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v25.20.0...sentry-v26.0.0) (2024-10-24)
+
+
+### ⚠ BREAKING CHANGES
+
+Make sure to upgrade to chart version 25.20.0 (Seentry 24.8.0) before upgrading to 26.x.x
+
+**Note:** In version [sentry-v25.19.0](https://github.com/sentry-kubernetes/charts/releases/tag/sentry-v26.5.0) ([commit](https://github.com/sentry-kubernetes/charts/commit/f5a12e04ee5ffa28f1d62bf6c7cb5c733b30c2b9)), SASL authentication functionality for Kafka was added, which broke backward compatibility when using an external Kafka cluster. The single-host external kafka setup works correctly. The [issue #1584](https://github.com/sentry-kubernetes/charts/issues/1584) was fixed in version [sentry-v26.5.0](https://github.com/sentry-kubernetes/charts/releases/tag/sentry-v26.5.0) ([commit](https://github.com/sentry-kubernetes/charts/commit/889bd0d47235cb1ab5a7b52439f5b8df61026a03)). In this case, for a sequential upgrade, a viable workaround could be to use [sentry-v26.5.0](https://github.com/sentry-kubernetes/charts/releases/tag/sentry-v26.5.0) with `appVersion: 24.8.0` initially ([Chart.yml](https://github.com/sentry-kubernetes/charts/blob/sentry-v26.5.0/charts/sentry/Chart.yaml#L6)), and then use [sentry-v26.5.0](https://github.com/sentry-kubernetes/charts/releases/tag/sentry-v26.5.0) as is ([details](https://github.com/sentry-kubernetes/charts/pull/1588#issuecomment-2459117235)).
+
+### Features
+
+* add maxTasksPerChild option to Sentry worker deployments ([#1572](https://github.com/sentry-kubernetes/charts/issues/1572)) ([bc32900](https://github.com/sentry-kubernetes/charts/commit/bc329004f46f4af7ecf4a99f07e74e28dbee436e))
+* update sentry appVersion to 24.9.0 ([#1571](https://github.com/sentry-kubernetes/charts/issues/1571)) ([2a3a030](https://github.com/sentry-kubernetes/charts/commit/2a3a030ba3c61c6792712c4f637fe64d42a47fe2))
+
 ## [25.20.0](https://github.com/sentry-kubernetes/charts/compare/sentry-v25.19.0...sentry-v25.20.0) (2024-10-23)
 
 

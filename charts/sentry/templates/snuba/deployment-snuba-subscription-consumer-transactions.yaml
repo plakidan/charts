@@ -48,10 +48,16 @@ spec:
       {{- if .Values.snuba.subscriptionConsumerTransactions.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.snuba.subscriptionConsumerTransactions.nodeSelector | indent 8 }}
+      {{- else if .Values.global.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
       {{- if .Values.snuba.subscriptionConsumerTransactions.tolerations }}
       tolerations:
 {{ toYaml .Values.snuba.subscriptionConsumerTransactions.tolerations | indent 8 }}
+      {{- else if .Values.global.tolerations }}
+      tolerations:
+{{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
       {{- if .Values.snuba.subscriptionConsumerTransactions.topologySpreadConstraints }}
       topologySpreadConstraints:
@@ -121,6 +127,12 @@ spec:
         securityContext:
 {{ toYaml .Values.snuba.subscriptionConsumerTransactions.containerSecurityContext | indent 12 }}
 {{- end }}
+{{- if .Values.snuba.subscriptionConsumerTransactions.sidecars }}
+{{ toYaml .Values.snuba.subscriptionConsumerTransactions.sidecars | indent 6 }}
+{{- end }}
+{{- if .Values.global.sidecars }}
+{{ toYaml .Values.global.sidecars | indent 6 }}
+{{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Values.serviceAccount.name }}-snuba
       {{- end }}
@@ -130,5 +142,8 @@ spec:
           name: {{ template "sentry.fullname" . }}-snuba
 {{- if .Values.snuba.subscriptionConsumerTransactions.volumes }}
 {{ toYaml .Values.snuba.subscriptionConsumerTransactions.volumes | indent 6 }}
+{{- end }}
+{{- if .Values.global.volumes }}
+{{ toYaml .Values.global.volumes | indent 6 }}
 {{- end }}
 {{- end }}

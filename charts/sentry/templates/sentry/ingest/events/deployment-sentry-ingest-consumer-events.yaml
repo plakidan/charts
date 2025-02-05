@@ -51,10 +51,16 @@ spec:
       {{- if .Values.sentry.ingestConsumerEvents.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.sentry.ingestConsumerEvents.nodeSelector | indent 8 }}
+      {{- else if .Values.global.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.ingestConsumerEvents.tolerations }}
       tolerations:
 {{ toYaml .Values.sentry.ingestConsumerEvents.tolerations | indent 8 }}
+      {{- else if .Values.global.tolerations }}
+      tolerations:
+{{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.ingestConsumerEvents.topologySpreadConstraints }}
       topologySpreadConstraints:
@@ -156,6 +162,9 @@ spec:
 {{- if .Values.sentry.ingestConsumerEvents.sidecars }}
 {{ toYaml .Values.sentry.ingestConsumerEvents.sidecars | indent 6 }}
 {{- end }}
+{{- if .Values.global.sidecars }}
+{{ toYaml .Values.global.sidecars | indent 6 }}
+{{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Values.serviceAccount.name }}-ingest-consumer-events
       {{- end }}
@@ -182,6 +191,9 @@ spec:
       {{ end }}
 {{- if .Values.sentry.ingestConsumerEvents.volumes }}
 {{ toYaml .Values.sentry.ingestConsumerEvents.volumes | indent 6 }}
+{{- end }}
+{{- if .Values.global.volumes }}
+{{ toYaml .Values.global.volumes | indent 6 }}
 {{- end }}
       {{- if .Values.sentry.ingestConsumerEvents.priorityClassName }}
       priorityClassName: "{{ .Values.sentry.ingestConsumerEvents.priorityClassName }}"

@@ -3,6 +3,16 @@ prefix:
 # Set this to true to support IPV6 networks
 ipv6: false
 
+global:
+
+  # Set SAMPLED_DEFAULT_RATE parameter for all projects
+  # sampledDefaultRate: 1.0
+
+  nodeSelector: {}
+  tolerations: []
+  sidecars: []
+  volumes: []
+
 user:
   create: true
   email: admin@sentry.local
@@ -155,6 +165,11 @@ relay:
     #  - name: compression.type
     #    value: "lz4"
 
+# Override custom Kafka topic names
+# WARNING: If you update this and you are also using the Kafka subchart, you need to update the provisioned Topic names in this values as well!
+# kafkaTopicOverrides:
+#  prefix: ""
+
 # enable and reference the volume
 geodata:
   accountID: ""
@@ -236,6 +251,7 @@ sentry:
   # - organizations:custom-metric
   # - organizations:custom-metrics-experimental
   # - organizations:derive-code-mappings
+  # other feature here https://github.com/getsentry/sentry/blob/24.11.2/src/sentry/features/temporary.py
 
   worker:
     enabled: true
@@ -255,6 +271,7 @@ sentry:
     # logLevel: "WARNING" # DEBUG|INFO|WARNING|ERROR|CRITICAL|FATAL
     # logFormat: "machine" # human|machine
     # excludeQueues: ""
+    # maxTasksPerChild: 1000
     # it's better to use prometheus adapter and scale based on
     # the size of the rabbitmq queue
     autoscaling:
@@ -292,6 +309,7 @@ sentry:
     # podLabels: {}
     # logLevel: "WARNING" # DEBUG|INFO|WARNING|ERROR|CRITICAL|FATAL
     # logFormat: "machine" # human|machine
+    # maxTasksPerChild: 1000
     # it's better to use prometheus adapter and scale based on
     # the size of the rabbitmq queue
     autoscaling:
@@ -327,6 +345,7 @@ sentry:
     # podLabels: {}
     # logLevel: "WARNING" # DEBUG|INFO|WARNING|ERROR|CRITICAL|FATAL
     # logFormat: "machine" # human|machine
+    # maxTasksPerChild: 1000
     # it's better to use prometheus adapter and scale based on
     # the size of the rabbitmq queue
     autoscaling:
@@ -351,6 +370,8 @@ sentry:
     enabled: true
     replicas: 1
     # concurrency: 4
+    # maxBatchTimeMs: 20000
+    # maxPollIntervalMs: 30000
     env: []
     resources: {}
     #  requests:
@@ -562,6 +583,40 @@ sentry:
     # autoOffsetReset: "earliest"
     # noStrictOffsetReset: false
 
+  ingestFeedback:
+    enabled: false
+    replicas: 1
+    env: []
+    resources: {}
+    #  requests:
+    #    cpu: 100m
+    #    memory: 250Mi
+    affinity: {}
+    nodeSelector: {}
+    securityContext: {}
+    containerSecurityContext: {}
+    # tolerations: []
+    # podLabels: {}
+    # it's better to use prometheus adapter and scale based on
+    # the size of the rabbitmq queue
+    autoscaling:
+      enabled: false
+      minReplicas: 1
+      maxReplicas: 3
+      targetCPUUtilizationPercentage: 50
+    sidecars: []
+    topologySpreadConstraints: []
+    volumes: []
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 320
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+    # autoOffsetReset: "earliest"
+    # noStrictOffsetReset: false
+
   ingestMonitors:
     enabled: true
     replicas: 1
@@ -583,6 +638,68 @@ sentry:
       minReplicas: 1
       maxReplicas: 3
       targetCPUUtilizationPercentage: 50
+    sidecars: []
+    topologySpreadConstraints: []
+    volumes: []
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 320
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+    # autoOffsetReset: "earliest"
+    # noStrictOffsetReset: false
+
+  monitorsClockTasks:
+    enabled: false
+    replicas: 1
+    env: []
+    resources: {}
+    #  requests:
+    #    cpu: 100m
+    #    memory: 250Mi
+    affinity: {}
+    nodeSelector: {}
+    securityContext: {}
+    containerSecurityContext: {}
+    # tolerations: []
+    # podLabels: {}
+    # it's better to use prometheus adapter and scale based on
+    # the size of the rabbitmq queue
+    autoscaling:
+      enabled: false
+    sidecars: []
+    topologySpreadConstraints: []
+    volumes: []
+    livenessProbe:
+      enabled: true
+      initialDelaySeconds: 5
+      periodSeconds: 320
+    # volumeMounts:
+    #   - mountPath: /dev/shm
+    #     name: dshm
+    # autoOffsetReset: "earliest"
+    # noStrictOffsetReset: false
+
+  monitorsClockTick:
+    enabled: false
+    replicas: 1
+    env: []
+    resources: {}
+    #  requests:
+    #    cpu: 100m
+    #    memory: 250Mi
+    affinity: {}
+    nodeSelector: {}
+    securityContext: {}
+    containerSecurityContext: {}
+    # tolerations: []
+    # podLabels: {}
+    # it's better to use prometheus adapter and scale based on
+    # the size of the rabbitmq queue
+    autoscaling:
+      enabled: false
     sidecars: []
     topologySpreadConstraints: []
     volumes: []
@@ -1099,6 +1216,7 @@ snuba:
     # queuedMinMessages: ""
     # volumes: []
     # volumeMounts: []
+    # noStrictOffsetReset: false
 
   metricsConsumer:
     enabled: true
@@ -1397,6 +1515,7 @@ snuba:
     env: []
     resources: {}
     affinity: {}
+    sidecars: []
     nodeSelector: {}
     securityContext: {}
     topologySpreadConstraints: []
@@ -1430,6 +1549,7 @@ snuba:
     env: []
     resources: {}
     affinity: {}
+    sidecars: []
     nodeSelector: {}
     securityContext: {}
     topologySpreadConstraints: []
@@ -1718,6 +1838,7 @@ symbolicator:
 
     # volumes: []
     # volumeMounts: []
+    # sidecars: []
 
   # TODO The cleanup cronjob is not yet implemented
   cleanup:
@@ -1725,6 +1846,8 @@ symbolicator:
     # podLabels: {}
     # affinity: {}
     # env: []
+    # volumes: []
+    # sidecars: []
 
 auth:
   register: true
@@ -1792,11 +1915,13 @@ openai: {}
 #   existingSecretKey: ""   # by default "api-token"
 
 nginx:
-  enabled: true
+  enabled: true  # true, if Safari compatibility is needed
   containerPort: 8080
   existingServerBlockConfigmap: '{{ template "sentry.fullname" . }}'
   resources: {}
   replicaCount: 1
+  nodeSelector: {}
+  # tolerations: []
   service:
     type: ClusterIP
     ports:
@@ -1833,6 +1958,8 @@ ingress:
   # If you are using AWS ALB Ingress controller, switch to true if you want activate the http to https redirection.
   alb:
     httpRedirect: false
+  # Add custom labels for ingress resource
+  # labels:
   # annotations:
   #   If you are using nginx ingress controller, please use at least those 2 annotations
   #   kubernetes.io/ingress.class: nginx
@@ -1868,7 +1995,7 @@ filestore:
       ##   GKE, AWS & OpenStack)
       ##
       # storageClass: "-"
-      accessMode: ReadWriteOnce
+      accessMode: ReadWriteOnce  # Set ReadWriteMany for work Replays
       size: 10Gi
 
       ## Whether to mount the persistent volume to the Sentry worker and
@@ -1924,6 +2051,8 @@ config:
 
 clickhouse:
   enabled: true
+  nodeSelector: {}
+  # tolerations: []
   clickhouse:
     replicas: "1"
     configmap:
@@ -1992,6 +2121,8 @@ zookeeper:
   enabled: true
   nameOverride: zookeeper-clickhouse
   replicaCount: 1
+  nodeSelector: {}
+  # tolerations: []
   ## When increasing the number of exceptions, you need to increase persistence.size
   # persistence:
   #   size: 8Gi
@@ -2002,11 +2133,12 @@ kafka:
   enabled: true
   provisioning:
     ## Increasing the replicationFactor enhances data reliability during Kafka pod failures by replicating data across multiple brokers.
-    # replicationFactor: 1
+    # Note that existing topics will remain with replicationFactor: 1 when updated.
+    replicationFactor: 3
     enabled: true
     # Topic list is based on files below.
     # - https://github.com/getsentry/snuba/blob/master/snuba/utils/streams/topics.py
-    # - https://github.com/getsentry/self-hosted/blob/master/install/create-kafka-topics.sh#L6
+    # - https://github.com/getsentry/sentry/blob/master/src/sentry/conf/types/kafka_definition.py
     ## Default number of partitions for topics when unspecified
     ##
     # numPartitions: 1
@@ -2034,26 +2166,23 @@ kafka:
         config:
           "message.timestamp.type": LogAppendTime
       - name: outcomes
+      - name: outcomes-dlq
       - name: outcomes-billing
+      - name: outcomes-billing-dlq
       - name: ingest-sessions
-      - name: snuba-sessions-commit-log
-        config:
-          "cleanup.policy": "compact,delete"
-          "min.compaction.lag.ms": "3600000"
       - name: snuba-metrics-commit-log
         config:
           "cleanup.policy": "compact,delete"
           "min.compaction.lag.ms": "3600000"
       - name: scheduled-subscriptions-events
       - name: scheduled-subscriptions-transactions
-      - name: scheduled-subscriptions-sessions
       - name: scheduled-subscriptions-metrics
       - name: scheduled-subscriptions-generic-metrics-sets
       - name: scheduled-subscriptions-generic-metrics-distributions
       - name: scheduled-subscriptions-generic-metrics-counters
+      - name: scheduled-subscriptions-generic-metrics-gauges
       - name: events-subscription-results
       - name: transactions-subscription-results
-      - name: sessions-subscription-results
       - name: metrics-subscription-results
       - name: generic-metrics-subscription-results
       - name: snuba-queries
@@ -2063,6 +2192,7 @@ kafka:
         config:
           "message.timestamp.type": LogAppendTime
       - name: profiles-call-tree
+      - name: snuba-profile-chunks
       - name: ingest-replay-events
         config:
           "message.timestamp.type": LogAppendTime
@@ -2082,6 +2212,10 @@ kafka:
         config:
           "cleanup.policy": "compact,delete"
           "min.compaction.lag.ms": "3600000"
+      - name: snuba-generic-metrics-gauges-commit-log
+        config:
+          "cleanup.policy": "compact,delete"
+          "min.compaction.lag.ms": "3600000"
       - name: generic-events
         config:
           "message.timestamp.type": LogAppendTime
@@ -2092,28 +2226,48 @@ kafka:
       - name: group-attributes
         config:
           "message.timestamp.type": LogAppendTime
-      - name: snuba-attribution
       - name: snuba-dead-letter-metrics
-      - name: snuba-dead-letter-sessions
       - name: snuba-dead-letter-generic-metrics
       - name: snuba-dead-letter-replays
       - name: snuba-dead-letter-generic-events
       - name: snuba-dead-letter-querylog
       - name: snuba-dead-letter-group-attributes
       - name: ingest-attachments
+      - name: ingest-attachments-dlq
       - name: ingest-transactions
+      - name: ingest-transactions-dlq
+      - name: ingest-transactions-backlog
+      - name: ingest-events-dlq
       - name: ingest-events
         ## If the number of exceptions increases, it is recommended to increase the number of partitions for ingest-events
         # partitions: 1
       - name: ingest-replay-recordings
       - name: ingest-metrics
+      - name: ingest-metrics-dlq
       - name: ingest-performance-metrics
+      - name: ingest-feedback-events
+      - name: ingest-feedback-events-dlq
       - name: ingest-monitors
+      - name: monitors-clock-tasks
+      - name: monitors-clock-tick
+      - name: monitors-incident-occurrences
       - name: profiles
       - name: ingest-occurrences
       - name: snuba-spans
+      - name: snuba-eap-spans-commit-log
+      - name: scheduled-subscriptions-eap-spans
+      - name: eap-spans-subscription-results
+      - name: snuba-eap-mutations
+      - name: snuba-lw-deletions-generic-events
       - name: shared-resources-usage
-      - name: snuba-metrics-summaries
+      - name: snuba-profile-chunks
+      - name: buffered-segments
+      - name: buffered-segments-dlq
+      - name: uptime-configs
+      - name: uptime-results
+      - name: snuba-uptime-results
+      - name: task-worker
+      - name: snuba-ourlogs
   listeners:
     client:
       protocol: "PLAINTEXT"
@@ -2129,6 +2283,8 @@ kafka:
     enabled: true
   controller:
     replicaCount: 3
+    nodeSelector: {}
+    # tolerations: []
     ## if the load on the kafka controller increases, resourcesPreset must be increased
     # resourcesPreset: small # small, medium, large, xlarge, 2xlarge
     ## if the load on the kafka controller increases, persistence.size must be increased
@@ -2165,10 +2321,19 @@ kafka:
 ## This value is only used when kafka.enabled is set to false
 ##
 externalKafka:
-  ## Hostname or ip address of external kafka
+  ## Multi hosts and ports of external kafka
   ##
+  # cluster:
+  #   - host: "233.5.100.28"
+  #     port: 9092
+  #   - host: "kafka-confluent-2"
+  #     port: 9093
+  #   - host: "kafka-confluent-3"
+  #     port: 9094
+  ## Or Hostname (ip address) of external kafka
   # host: "kafka-confluent"
-  port: 9092
+  ## and port of external kafka
+  # port: 9092
   compression:
     type:  # 'gzip', 'snappy', 'lz4', 'zstd'
   message:
@@ -2191,6 +2356,8 @@ redis:
   enabled: true
   replica:
     replicaCount: 1
+    nodeSelector: {}
+    # tolerations: []
   auth:
     enabled: false
     sentinel: false
@@ -2203,6 +2370,8 @@ redis:
   master:
     persistence:
       enabled: true
+    nodeSelector: {}
+    # tolerations: []
   ## Use this to enable an extra service account
   # serviceAccount:
   #   create: false
@@ -2246,6 +2415,8 @@ postgresql:
   # primary:
   #   extendedConfiguration: |
   #     max_connections=100
+  #    nodeSelector: {}
+  #    tolerations: []
   ## When increasing the number of exceptions, you need to increase persistence.size
   # primary:
   #   persistence:
@@ -2286,7 +2457,6 @@ rabbitmq:
     username: guest
     password: guest
   nameOverride: ""
-
   pdb:
     create: true
   persistence:
@@ -2296,7 +2466,6 @@ rabbitmq:
     # enabled: true
     # type: relative
     # value: 0.4
-
   extraSecrets:
     load-definition:
       load_definition.json: |
@@ -2342,6 +2511,13 @@ rabbitmq:
   # serviceAccount:
   #   create: false
   #   name: rabbitmq
+  metrics:
+    enabled: false
+    serviceMonitor:
+      enabled: false
+      path: "/metrics/per-object"  # https://www.rabbitmq.com/docs/prometheus
+      labels:
+        release: "prometheus-operator"  # helm release of kube-prometheus-stack
 
 memcached:
   memoryLimit: "2048"
@@ -2354,6 +2530,8 @@ memcached:
     - "-m $(MEMCACHED_MEMORY_LIMIT)"
     - "-I $(MEMCACHED_MAX_ITEM_SIZE)"
   extraEnvVarsCM: "sentry-memcached"
+  nodeSelector: {}
+  # tolerations: []
 
 ## Prometheus Exporter / Metrics
 ##
@@ -2394,6 +2572,10 @@ metrics:
   affinity: {}
   securityContext: {}
   containerSecurityContext: {}
+
+  volumes: []
+  sidecars: []
+
   # schedulerName:
   # Optional extra labels for pod, i.e. redis-client: "true"
   # podLabels: {}
@@ -2430,3 +2612,39 @@ revisionHistoryLimit: 10
 #   options: []
 
 extraManifests: []
+
+pgbouncer:
+  enabled: false
+  postgres:
+    cp_max: 10
+    cp_min: 5
+    host: ''
+    dbname: ''
+    user: ''
+    password: ''
+  image:
+    repository: "bitnami/pgbouncer"
+    tag: "1.23.1-debian-12-r5"
+    pullPolicy: IfNotPresent
+  replicas: 2
+  podDisruptionBudget:
+    enabled: true
+    # Define either 'minAvailable' or 'maxUnavailable', never both.
+    minAvailable: 1
+    # -- Maximum unavailable pods set in PodDisruptionBudget. If set, 'minAvailable' is ignored.
+    # maxUnavailable: 1
+  authType: "md5"
+  maxClientConn: "8192"
+  poolSize: "50"
+  poolMode: "transaction"
+  resources: {}
+  nodeSelector: {}
+  tolerations: []
+  affinity: {}
+  updateStrategy:
+    type: RollingUpdate
+    rollingUpdate:
+      maxUnavailable: 1
+      maxSurge: 25%
+  priorityClassName: ''
+  topologySpreadConstraints: []

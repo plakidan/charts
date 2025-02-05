@@ -1,8 +1,8 @@
-{{- if .Values.sentry.billingMetricsConsumer.enabled }}
+{{- if .Values.sentry.monitorsClockTick.enabled }}
 apiVersion: apps/v1
 kind: Deployment
 metadata:
-  name: {{ template "sentry.fullname" . }}-billing-metrics-consumer
+  name: {{ template "sentry.fullname" . }}-monitors-clock-tick
   labels:
     app: {{ template "sentry.fullname" . }}
     chart: "{{ .Chart.Name }}-{{ .Chart.Version | replace "+" "_" }}"
@@ -10,7 +10,6 @@ metadata:
     heritage: "{{ .Release.Service }}"
     app.kubernetes.io/managed-by: "Helm"
   {{- if .Values.asHook }}
-  {{- /* Add the Helm annotations so that deployment after asHook from true to false works */}}
   annotations:
     meta.helm.sh/release-name: "{{ .Release.Name }}"
     meta.helm.sh/release-namespace: "{{ .Release.Namespace }}"
@@ -23,9 +22,9 @@ spec:
     matchLabels:
       app: {{ template "sentry.fullname" . }}
       release: "{{ .Release.Name }}"
-      role: billing-metrics-consumer
-{{- if not .Values.sentry.billingMetricsConsumer.autoscaling.enabled }}
-  replicas: {{ .Values.sentry.billingMetricsConsumer.replicas }}
+      role: monitors-clock-tick
+{{- if not .Values.sentry.monitorsClockTick.autoscaling.enabled }}
+  replicas: {{ .Values.sentry.monitorsClockTick.replicas }}
 {{- end }}
   template:
     metadata:
@@ -33,38 +32,38 @@ spec:
         checksum/configYml: {{ .Values.config.configYml | toYaml | toString | sha256sum }}
         checksum/sentryConfPy: {{ .Values.config.sentryConfPy | sha256sum }}
         checksum/config.yaml: {{ include "sentry.config" . | sha256sum }}
-        {{- if .Values.sentry.billingMetricsConsumer.annotations }}
-{{ toYaml .Values.sentry.billingMetricsConsumer.annotations | indent 8 }}
+        {{- if .Values.sentry.monitorsClockTick.annotations }}
+{{ toYaml .Values.sentry.monitorsClockTick.annotations | indent 8 }}
         {{- end }}
       labels:
         app: {{ template "sentry.fullname" . }}
         release: "{{ .Release.Name }}"
-        role: billing-metrics-consumer
-        {{- if .Values.sentry.billingMetricsConsumer.podLabels }}
-{{ toYaml .Values.sentry.billingMetricsConsumer.podLabels | indent 8 }}
+        role: monitors-clock-tick
+        {{- if .Values.sentry.monitorsClockTick.podLabels }}
+{{ toYaml .Values.sentry.monitorsClockTick.podLabels | indent 8 }}
         {{- end }}
     spec:
       affinity:
-      {{- if .Values.sentry.billingMetricsConsumer.affinity }}
-{{ toYaml .Values.sentry.billingMetricsConsumer.affinity | indent 8 }}
+      {{- if .Values.sentry.monitorsClockTick.affinity }}
+{{ toYaml .Values.sentry.monitorsClockTick.affinity | indent 8 }}
       {{- end }}
-      {{- if .Values.sentry.billingMetricsConsumer.nodeSelector }}
+      {{- if .Values.sentry.monitorsClockTick.nodeSelector }}
       nodeSelector:
-{{ toYaml .Values.sentry.billingMetricsConsumer.nodeSelector | indent 8 }}
+{{ toYaml .Values.sentry.monitorsClockTick.nodeSelector | indent 8 }}
       {{- else if .Values.global.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
-      {{- if .Values.sentry.billingMetricsConsumer.tolerations }}
+      {{- if .Values.sentry.monitorsClockTick.tolerations }}
       tolerations:
-{{ toYaml .Values.sentry.billingMetricsConsumer.tolerations | indent 8 }}
+{{ toYaml .Values.sentry.monitorsClockTick.tolerations | indent 8 }}
       {{- else if .Values.global.tolerations }}
       tolerations:
 {{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
-      {{- if .Values.sentry.billingMetricsConsumer.topologySpreadConstraints }}
+      {{- if .Values.sentry.monitorsClockTick.topologySpreadConstraints }}
       topologySpreadConstraints:
-{{ toYaml .Values.sentry.billingMetricsConsumer.topologySpreadConstraints | indent 8 }}
+{{ toYaml .Values.sentry.monitorsClockTick.topologySpreadConstraints | indent 8 }}
       {{- end }}
       {{- if .Values.images.sentry.imagePullSecrets }}
       imagePullSecrets:
@@ -77,48 +76,47 @@ spec:
       dnsConfig:
 {{ toYaml .Values.dnsConfig | indent 8 }}
       {{- end }}
-      {{- if .Values.sentry.billingMetricsConsumer.securityContext }}
+      {{- if .Values.sentry.monitorsClockTick.securityContext }}
       securityContext:
-{{ toYaml .Values.sentry.billingMetricsConsumer.securityContext | indent 8 }}
+{{ toYaml .Values.sentry.monitorsClockTick.securityContext | indent 8 }}
       {{- end }}
       containers:
-      - name: {{ .Chart.Name }}-billing-metrics-consumer
+      - name: {{ .Chart.Name }}-monitors-clock-tick
         image: "{{ template "sentry.image" . }}"
         imagePullPolicy: {{ default "IfNotPresent" .Values.images.sentry.pullPolicy }}
         command: ["sentry"]
         args:
           - "run"
           - "consumer"
-          - "billing-metrics-consumer"
+          - "monitors-clock-tick"
           - "--consumer-group"
-          - "billing-metrics-consumer"
-          {{- if .Values.sentry.billingMetricsConsumer.autoOffsetReset }}
+          - "monitors-clock-tick"
+          {{- if .Values.sentry.monitorsClockTick.autoOffsetReset }}
           - "--auto-offset-reset"
-          - "{{ .Values.sentry.billingMetricsConsumer.autoOffsetReset }}"
+          - "{{ .Values.sentry.monitorsClockTick.autoOffsetReset }}"
           {{- end }}
-          {{- if .Values.sentry.billingMetricsConsumer.noStrictOffsetReset }}
+          {{- if .Values.sentry.monitorsClockTick.noStrictOffsetReset }}
           - "--no-strict-offset-reset"
           {{- end }}
-          {{- if .Values.sentry.billingMetricsConsumer.livenessProbe.enabled }}
+          {{- if .Values.sentry.monitorsClockTick.livenessProbe.enabled }}
           - "--healthcheck-file-path"
           - "/tmp/health.txt"
           {{- end }}
-          - "--"
-        {{- if .Values.sentry.billingMetricsConsumer.livenessProbe.enabled }}
+        {{- if .Values.sentry.monitorsClockTick.livenessProbe.enabled }}
         livenessProbe:
           exec:
             command:
               - rm
               - /tmp/health.txt
-          initialDelaySeconds: {{ .Values.sentry.billingMetricsConsumer.livenessProbe.initialDelaySeconds }}
-          periodSeconds: {{ .Values.sentry.billingMetricsConsumer.livenessProbe.periodSeconds }}
+          initialDelaySeconds: {{ .Values.sentry.monitorsClockTick.livenessProbe.initialDelaySeconds }}
+          periodSeconds: {{ .Values.sentry.monitorsClockTick.livenessProbe.periodSeconds }}
         {{- end }}
         env:
         - name: C_FORCE_ROOT
           value: "true"
 {{ include "sentry.env" . | indent 8 }}
-{{- if .Values.sentry.billingMetricsConsumer.env }}
-{{ toYaml .Values.sentry.billingMetricsConsumer.env | indent 8 }}
+{{- if .Values.sentry.monitorsClockTick.env }}
+{{ toYaml .Values.sentry.monitorsClockTick.env | indent 8 }}
 {{- end }}
         volumeMounts:
         - mountPath: /etc/sentry
@@ -130,23 +128,23 @@ spec:
         - name: sentry-google-cloud-key
           mountPath: /var/run/secrets/google
         {{ end }}
-{{- if .Values.sentry.billingMetricsConsumer.volumeMounts }}
-{{ toYaml .Values.sentry.billingMetricsConsumer.volumeMounts | indent 8 }}
+{{- if .Values.sentry.monitorsClockTick.volumeMounts }}
+{{ toYaml .Values.sentry.monitorsClockTick.volumeMounts | indent 8 }}
 {{- end }}
         resources:
-{{ toYaml .Values.sentry.billingMetricsConsumer.resources | indent 12 }}
-{{- if .Values.sentry.billingMetricsConsumer.containerSecurityContext }}
+{{ toYaml .Values.sentry.monitorsClockTick.resources | indent 12 }}
+{{- if .Values.sentry.monitorsClockTick.containerSecurityContext }}
         securityContext:
-{{ toYaml .Values.sentry.billingMetricsConsumer.containerSecurityContext | indent 12 }}
+{{ toYaml .Values.sentry.monitorsClockTick.containerSecurityContext | indent 12 }}
 {{- end }}
-{{- if .Values.sentry.billingMetricsConsumer.sidecars }}
-{{ toYaml .Values.sentry.billingMetricsConsumer.sidecars | indent 6 }}
+{{- if .Values.sentry.monitorsClockTick.sidecars }}
+{{ toYaml .Values.sentry.monitorsClockTick.sidecars | indent 6 }}
 {{- end }}
 {{- if .Values.global.sidecars }}
 {{ toYaml .Values.global.sidecars | indent 6 }}
 {{- end }}
       {{- if .Values.serviceAccount.enabled }}
-      serviceAccountName: {{ .Values.serviceAccount.name }}-billing-metrics-consumer
+      serviceAccountName: {{ .Values.serviceAccount.name }}-monitors-clock-tick
       {{- end }}
       volumes:
       - name: config
@@ -169,13 +167,13 @@ spec:
         secret:
           secretName: {{ .Values.filestore.gcs.secretName }}
       {{ end }}
-{{- if .Values.sentry.billingMetricsConsumer.volumes }}
-{{ toYaml .Values.sentry.billingMetricsConsumer.volumes | indent 6 }}
+{{- if .Values.sentry.monitorsClockTick.volumes }}
+{{ toYaml .Values.sentry.monitorsClockTick.volumes | indent 6 }}
 {{- end }}
 {{- if .Values.global.volumes }}
 {{ toYaml .Values.global.volumes | indent 6 }}
 {{- end }}
-      {{- if .Values.sentry.billingMetricsConsumer.priorityClassName }}
-      priorityClassName: "{{ .Values.sentry.billingMetricsConsumer.priorityClassName }}"
+      {{- if .Values.sentry.monitorsClockTick.priorityClassName }}
+      priorityClassName: "{{ .Values.sentry.monitorsClockTick.priorityClassName }}"
       {{- end }}
 {{- end }}

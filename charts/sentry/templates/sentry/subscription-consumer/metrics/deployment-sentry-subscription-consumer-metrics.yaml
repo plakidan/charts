@@ -49,10 +49,16 @@ spec:
       {{- if .Values.sentry.subscriptionConsumerMetrics.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.sentry.subscriptionConsumerMetrics.nodeSelector | indent 8 }}
+      {{- else if .Values.global.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.subscriptionConsumerMetrics.tolerations }}
       tolerations:
 {{ toYaml .Values.sentry.subscriptionConsumerMetrics.tolerations | indent 8 }}
+      {{- else if .Values.global.tolerations }}
+      tolerations:
+{{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.subscriptionConsumerMetrics.topologySpreadConstraints }}
       topologySpreadConstraints:
@@ -142,6 +148,9 @@ spec:
 {{- if .Values.sentry.subscriptionConsumerMetrics.sidecars }}
 {{ toYaml .Values.sentry.subscriptionConsumerMetrics.sidecars | indent 6 }}
 {{- end }}
+{{- if .Values.global.sidecars }}
+{{ toYaml .Values.global.sidecars | indent 6 }}
+{{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Values.serviceAccount.name }}-subscription-consumer-metrics
       {{- end }}
@@ -168,6 +177,9 @@ spec:
       {{ end }}
 {{- if .Values.sentry.subscriptionConsumerMetrics.volumes }}
 {{ toYaml .Values.sentry.subscriptionConsumerMetrics.volumes | indent 6 }}
+{{- end }}
+{{- if .Values.global.volumes }}
+{{ toYaml .Values.global.volumes | indent 6 }}
 {{- end }}
       {{- if .Values.sentry.subscriptionConsumerMetrics.priorityClassName }}
       priorityClassName: "{{ .Values.sentry.subscriptionConsumerMetrics.priorityClassName }}"

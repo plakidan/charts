@@ -51,10 +51,16 @@ spec:
       {{- if .Values.sentry.ingestConsumerAttachments.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.sentry.ingestConsumerAttachments.nodeSelector | indent 8 }}
+      {{- else if .Values.global.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.ingestConsumerAttachments.tolerations }}
       tolerations:
 {{ toYaml .Values.sentry.ingestConsumerAttachments.tolerations | indent 8 }}
+      {{- else if .Values.global.tolerations }}
+      tolerations:
+{{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.ingestConsumerAttachments.topologySpreadConstraints }}
       topologySpreadConstraints:
@@ -101,6 +107,10 @@ spec:
           - "--log-level"
           - "{{ .Values.sentry.ingestConsumerAttachments.logLevel }}"
           {{- end }}
+          {{- if .Values.sentry.ingestConsumerAttachments.maxPollIntervalMs }}
+          - "--max-poll-interval-ms"
+          - "{{ .Values.sentry.ingestConsumerAttachments.maxPollIntervalMs }}"
+          {{- end }}
           - "--"
           {{- if .Values.sentry.ingestConsumerAttachments.concurrency }}
           - "--processes"
@@ -109,6 +119,10 @@ spec:
           {{- if .Values.sentry.ingestConsumerAttachments.maxBatchSize }}
           - "--max-batch-size"
           - "{{ .Values.sentry.ingestConsumerAttachments.maxBatchSize }}"
+          {{- end }}
+          {{- if .Values.sentry.ingestConsumerAttachments.maxBatchTimeMs }}
+          - "--max-batch-size"
+          - "{{ .Values.sentry.ingestConsumerAttachments.maxBatchTimeMs }}"
           {{- end }}
         {{- if .Values.sentry.ingestConsumerAttachments.livenessProbe.enabled }}
         livenessProbe:
@@ -148,6 +162,9 @@ spec:
 {{- if .Values.sentry.ingestConsumerAttachments.sidecars }}
 {{ toYaml .Values.sentry.ingestConsumerAttachments.sidecars | indent 6 }}
 {{- end }}
+{{- if .Values.global.sidecars }}
+{{ toYaml .Values.global.sidecars | indent 6 }}
+{{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Values.serviceAccount.name }}-ingest-consumer-attachments
       {{- end }}
@@ -175,7 +192,10 @@ spec:
 {{- if .Values.sentry.ingestConsumerAttachments.volumes }}
 {{ toYaml .Values.sentry.ingestConsumerAttachments.volumes | indent 6 }}
 {{- end }}
-      {{- if .Values.sentry.ingestConsumerAttachments.priorityClassName }}
-      priorityClassName: "{{ .Values.sentry.ingestConsumerAttachments.priorityClassName }}"
+{{- if .Values.global.volumes }}
+{{ toYaml .Values.global.volumes | indent 6 }}
+{{- end }}
+      {{- if .Values.sentry.ingestConsumerEvents.priorityClassName }}
+      priorityClassName: "{{ .Values.sentry.ingestConsumerEvents.priorityClassName }}"
       {{- end }}
 {{- end }}

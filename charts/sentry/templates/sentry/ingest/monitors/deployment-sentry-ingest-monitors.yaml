@@ -51,10 +51,16 @@ spec:
       {{- if .Values.sentry.ingestMonitors.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.sentry.ingestMonitors.nodeSelector | indent 8 }}
+      {{- else if .Values.global.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.ingestMonitors.tolerations }}
       tolerations:
 {{ toYaml .Values.sentry.ingestMonitors.tolerations | indent 8 }}
+      {{- else if .Values.global.tolerations }}
+      tolerations:
+{{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
       {{- if .Values.sentry.ingestMonitors.topologySpreadConstraints }}
       topologySpreadConstraints:
@@ -135,6 +141,9 @@ spec:
 {{- if .Values.sentry.ingestMonitors.sidecars }}
 {{ toYaml .Values.sentry.ingestMonitors.sidecars | indent 6 }}
 {{- end }}
+{{- if .Values.global.sidecars }}
+{{ toYaml .Values.global.sidecars | indent 6 }}
+{{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Values.serviceAccount.name }}-ingest-monitors
       {{- end }}
@@ -161,6 +170,9 @@ spec:
       {{ end }}
 {{- if .Values.sentry.ingestMonitors.volumes }}
 {{ toYaml .Values.sentry.ingestMonitors.volumes | indent 6 }}
+{{- end }}
+{{- if .Values.global.volumes }}
+{{ toYaml .Values.global.volumes | indent 6 }}
 {{- end }}
       {{- if .Values.sentry.ingestMonitors.priorityClassName }}
       priorityClassName: "{{ .Values.sentry.ingestMonitors.priorityClassName }}"

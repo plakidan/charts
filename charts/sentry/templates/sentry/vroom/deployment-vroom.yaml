@@ -48,10 +48,16 @@ spec:
       {{- if .Values.vroom.nodeSelector }}
       nodeSelector:
 {{ toYaml .Values.vroom.nodeSelector | indent 8 }}
+      {{- else if .Values.global.nodeSelector }}
+      nodeSelector:
+{{ toYaml .Values.global.nodeSelector | indent 8 }}
       {{- end }}
       {{- if .Values.vroom.tolerations }}
       tolerations:
 {{ toYaml .Values.vroom.tolerations | indent 8 }}
+      {{- else if .Values.global.tolerations }}
+      tolerations:
+{{ toYaml .Values.global.tolerations | indent 8 }}
       {{- end }}
       {{- if .Values.vroom.topologySpreadConstraints }}
       topologySpreadConstraints:
@@ -114,12 +120,20 @@ spec:
 {{- if .Values.vroom.sidecars }}
 {{ toYaml .Values.vroom.sidecars | indent 6 }}
 {{- end }}
+{{- if .Values.global.sidecars }}
+{{ toYaml .Values.global.sidecars | indent 6 }}
+{{- end }}
       {{- if .Values.serviceAccount.enabled }}
       serviceAccountName: {{ .Values.serviceAccount.name }}-vroom
       {{- end }}
-{{- if .Values.vroom.volumes }}
+{{- if or .Values.vroom.volumes .Values.global.volumes }}
       volumes:
+{{- if .Values.vroom.volumes }}
 {{ toYaml .Values.vroom.volumes | indent 6 }}
+{{- end }}
+{{- if .Values.global.volumes }}
+{{ toYaml .Values.global.volumes | indent 6 }}
+{{- end }}
 {{- end }}
       {{- if .Values.vroom.priorityClassName }}
       priorityClassName: "{{ .Values.vroom.priorityClassName }}"
